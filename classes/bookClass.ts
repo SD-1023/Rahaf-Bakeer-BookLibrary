@@ -13,6 +13,7 @@ export default class CBook implements DBAction<IBook> {
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {
+    
       throw new Error(e);
     }
   }
