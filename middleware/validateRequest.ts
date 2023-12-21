@@ -54,6 +54,36 @@ async function bookPostValidation(
   }
 }
 
+async function publisherPostValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let bookSchema = object({
+    body: object({
+      name: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable()
+        .required("The Name is required"),
+      country: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable(),
+    })
+      .required("The name,author,isbn are required")
+      .nullable()
+      .strict(true),
+  });
+
+  try {
+    const book = await bookSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
 async function validateIDParams(
   req: Request,
   res: Response,
@@ -167,9 +197,41 @@ async function bookPostUpdateValidation(
   }
 }
 
+async function publisherPostUpdateValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let bookSchema = object({
+    body: object({
+      name: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable(),
+
+      country: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable(),
+    })
+      .required("The name,author,isbn are required")
+      .nullable()
+      .strict(true),
+  });
+
+  try {
+    const book = await bookSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
 export default {
   bookPostValidation,
   validateIDParams,
   validateNameQuery,
   bookPostUpdateValidation,
+  publisherPostValidation,
+  publisherPostUpdateValidation,
 };

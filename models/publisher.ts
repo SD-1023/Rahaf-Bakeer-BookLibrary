@@ -38,7 +38,7 @@ class Publisher extends Model<IPublisher> implements IPublisher {
   @Column({
     type: DataType.STRING(1024),
   })
-  declare counters?: string;
+  declare country?: string;
 
   @HasMany(() => Book, { foreignKey: "publisher_id" })
   declare Book: Book[];

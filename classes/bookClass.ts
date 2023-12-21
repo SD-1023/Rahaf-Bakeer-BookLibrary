@@ -62,18 +62,14 @@ export default class CBook implements DBAction<IBook> {
   }
 
   async deleteEntities(
-    conditionKey: string,
+    
     conditionValue: string | number
-  ): Promise<boolean> {
+  ): Promise<boolean | void> {
     try {
       const book = await Book.findByPk(conditionValue);
       await book?.destroy();
-      if (book) {
-        const books = await this.getEntities(undefined, true);
-        return true;
-      } else {
-        return false;
-      }
+     await this.getEntities(undefined, true);
+  
     } catch (e: any) {
       throw new Error(e.message);
     }
