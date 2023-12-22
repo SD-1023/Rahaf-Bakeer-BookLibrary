@@ -2,7 +2,7 @@ import DBAction from "../interfaces/classInterface";
 import { IBook, IComment, IPublisher } from "../interfaces/objInterfaces";
 import Book from "../models/Book";
 import { appCache, getCacheValue } from "../appCache";
-import { number } from "yup";
+import { number, object } from "yup";
 import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
 import { Sequelize } from "sequelize-typescript";
@@ -111,4 +111,12 @@ export default class CPublisher implements DBAction<IPublisher> {
       throw new Error(e.message);
     }
   }
+
+
+async getOtherEntity(id:number): Promise<IBook[]> {
+const data= await this.getEntityByID(id) as object;
+return data["books" as keyof object] as IBook[];
+
+}
+
 }

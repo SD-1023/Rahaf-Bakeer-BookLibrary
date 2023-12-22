@@ -5,7 +5,8 @@ import { appCache, getCacheValue } from "../appCache";
 import { number } from "yup";
 import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
-import { Sequelize } from "sequelize-typescript";
+import { Sequelize, addAttribute } from "sequelize-typescript";
+import { Op } from "sequelize";
 
 export default class CBook implements DBAction<IBook> {
   async addEntities(data: IBook): Promise<IBook> {
@@ -13,7 +14,6 @@ export default class CBook implements DBAction<IBook> {
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {
-    
       throw new Error(e);
     }
   }
@@ -62,14 +62,12 @@ export default class CBook implements DBAction<IBook> {
   }
 
   async deleteEntities(
-    
     conditionValue: string | number
   ): Promise<boolean | void> {
     try {
       const book = await Book.findByPk(conditionValue);
       await book?.destroy();
-     await this.getEntities(undefined, true);
-  
+      await this.getEntities(undefined, true);
     } catch (e: any) {
       throw new Error(e.message);
     }
@@ -114,6 +112,40 @@ export default class CBook implements DBAction<IBook> {
       }
     } catch (e: any) {
       throw new Error(e.message);
+    }
+  }
+
+  async getRatedEntities(): Promise<Book[]> {
+    try {
+      const data = await Book.findAll({
+        subQuery: false,
+        attributes: [
+          "book_id",
+          "title",
+          "author",
+          "publisher_id",
+          "pages",
+          "year",
+          [Sequelize.fn("AVG", Sequelize.col("Comment.stars")), "AVGRating"],
+        ],
+        include: {
+          model: Comment,
+          nested: true,
+          attributes: [],
+          where: {
+            stars: {
+              [Op.not]: null,
+            },
+          },
+          required: false,
+        },
+        group: ["book_id"],
+        order: [[Sequelize.literal("AVGRating"), "DESC"]],
+        limit: 10,
+      });
+      return data;
+    } catch (e: any) {
+      throw new Error(e);
     }
   }
 }

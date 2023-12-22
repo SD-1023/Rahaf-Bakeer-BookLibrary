@@ -1,6 +1,5 @@
 import express, { Router, Request, Response } from "express";
 import bodyParser from "body-parser";
-// import services from "./services";
 import reqValidation from "../middleware/validateRequest";
 import CBook from "../classes/bookClass";
 import { IBook } from "../interfaces/objInterfaces";
@@ -12,6 +11,18 @@ const router = Router();
 appCache.set("Book", new CBook());
 appCache.set("Publisher", new CPublisher());
 appCache.set("Comment", new CComment());
+
+
+
+router.get("/books/top-rated", async (req: Request, res: Response) => {
+  try {
+    const book = getCacheValue("Book") as CBook;
+    const dataInfo = await book?.getRatedEntities();
+    res.status(200).send(dataInfo);
+  } catch (e: any) {
+    res.status(500).send();
+  }
+});
 
 router.get(
   "/books/:id",
@@ -41,6 +52,18 @@ router.get(
   }
 );
 
+router.get('/publishers/:id/books',  reqValidation.validateIDParams, async(req: Request, res: Response)=>{
+
+  try {
+    const publisher = getCacheValue("Publisher") as CPublisher;
+    const dataInfo = await publisher?.getOtherEntity(Number(req.params.id));
+    res.status(200).send(dataInfo);
+  } catch (e: any) {
+    res.status(500).send();
+  }
+
+});
+
 router.get(
   "/comments/:id",
   reqValidation.validateIDParams,
@@ -55,6 +78,9 @@ router.get(
   }
 );
 
+
+
+
 router.get("/books", async (req: Request, res: Response) => {
   try {
     const book = getCacheValue("Book") as CBook;
@@ -64,6 +90,10 @@ router.get("/books", async (req: Request, res: Response) => {
     res.status(500).send();
   }
 });
+
+
+
+
 
 router.get("/publishers", async (req: Request, res: Response) => {
   try {
@@ -84,6 +114,8 @@ router.get("/comments", async (req: Request, res: Response) => {
     res.status(500).send();
   }
 });
+
+
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -225,4 +257,8 @@ router.delete(
     }
   }
 );
+
+
+
+
 export default router;
