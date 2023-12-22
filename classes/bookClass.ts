@@ -122,6 +122,7 @@ export default class CBook implements DBAction<IBook> {
         attributes: [
           "book_id",
           "title",
+          "isbn",
           "author",
           "publisher_id",
           "pages",
