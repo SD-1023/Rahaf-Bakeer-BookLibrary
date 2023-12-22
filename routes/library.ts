@@ -6,10 +6,12 @@ import CBook from "../classes/bookClass";
 import { IBook } from "../interfaces/objInterfaces";
 import { appCache, getCacheValue } from "../appCache";
 import CPublisher from "../classes/publisherClass";
+import CComment from "../classes/commentClass";
 const router = Router();
 
 appCache.set("Book", new CBook());
 appCache.set("Publisher", new CPublisher());
+appCache.set("Comment", new CComment());
 
 router.get(
   "/books/:id",
@@ -39,6 +41,20 @@ router.get(
   }
 );
 
+router.get(
+  "/comments/:id",
+  reqValidation.validateIDParams,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = getCacheValue("Comment") as CComment;
+      const dataInfo = await comment?.getEntityByID(Number(req.params.id));
+      res.status(200).send(dataInfo);
+    } catch (e: any) {
+      res.status(500).send();
+    }
+  }
+);
+
 router.get("/books", async (req: Request, res: Response) => {
   try {
     const book = getCacheValue("Book") as CBook;
@@ -53,6 +69,16 @@ router.get("/publishers", async (req: Request, res: Response) => {
   try {
     const publisher = getCacheValue("Publisher") as CPublisher;
     const dataInfo = await publisher?.getEntities();
+    res.status(200).send(dataInfo);
+  } catch (e: any) {
+    res.status(500).send();
+  }
+});
+
+router.get("/comments", async (req: Request, res: Response) => {
+  try {
+    const comment = getCacheValue("Comment") as CComment;
+    const dataInfo = await comment?.getEntities();
     res.status(200).send(dataInfo);
   } catch (e: any) {
     res.status(500).send();
@@ -89,6 +115,21 @@ router.post(
     }
   }
 );
+
+router.post(
+  "/comments",
+  reqValidation.commentPostValidation,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = getCacheValue("Comment") as CComment;
+      const dataInfo = await comment?.addEntities(req.body);
+      res.status(200).send(dataInfo);
+    } catch (e: any) {
+      res.status(500).send();
+    }
+  }
+);
+
 router.patch(
   "/books/:id",
   reqValidation.bookPostUpdateValidation,
@@ -125,6 +166,24 @@ router.patch(
   }
 );
 
+router.patch(
+  "/comments/:id",
+  reqValidation.commentPostUpdateValidation,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = getCacheValue("Comment") as CComment;
+      const dataInfo = await comment?.updateEntities(
+        req.body,
+        "comment_id",
+        req.params.id
+      );
+      res.status(200).send(dataInfo.toString());
+    } catch (e: any) {
+      res.status(500).send();
+    }
+  }
+);
+
 router.delete(
   "/books/:id",
   reqValidation.validateIDParams,
@@ -146,6 +205,20 @@ router.delete(
     try {
       const publisher = getCacheValue("Publisher") as CPublisher;
       const dataInfo = await publisher?.deleteEntities(req.params.id);
+      res.status(200).send(dataInfo);
+    } catch (e: any) {
+      res.status(500).send();
+    }
+  }
+);
+
+router.delete(
+  "/comments/:id",
+  reqValidation.validateIDParams,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = getCacheValue("Comment") as CComment;
+      const dataInfo = await comment?.deleteEntities(req.params.id);
       res.status(200).send(dataInfo);
     } catch (e: any) {
       res.status(500).send();

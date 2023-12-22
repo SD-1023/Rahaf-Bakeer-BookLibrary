@@ -97,7 +97,7 @@ export default class CPublisher implements DBAction<IPublisher> {
         if (foundPublisherData) {
           const dataToReturn = {
             publisher: (({ Book, ...o }) => o)(foundPublisherData.toJSON()),
-            book: foundPublisherData.toJSON()["Book" as keyof IPublisher],
+            books: foundPublisherData.toJSON()["Book" as keyof IPublisher],
           };
 
           publisherData.push(dataToReturn as any);
@@ -105,7 +105,7 @@ export default class CPublisher implements DBAction<IPublisher> {
 
           return dataToReturn;
         }
-        return { publisher: {}, book: [] as IBook[] };
+        return { publisher: {}, books: [] as IBook[] };
       }
     } catch (e: any) {
       throw new Error(e.message);

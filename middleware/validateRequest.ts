@@ -43,11 +43,12 @@ async function bookPostValidation(
     })
       .required("The name,author,isbn are required")
       .nullable()
-      .strict(true),
+      .strict(true)
+      .noUnknown(true),
   });
 
   try {
-    const book = await bookSchema.validate({ body: req.body });
+    const response = await bookSchema.validate({ body: req.body });
     next();
   } catch (e: any) {
     return res.status(400).send(e.message);
@@ -59,7 +60,7 @@ async function publisherPostValidation(
   res: Response,
   next: NextFunction
 ) {
-  let bookSchema = object({
+  let publisherSchema = object({
     body: object({
       name: string()
         .strict(true)
@@ -68,16 +69,60 @@ async function publisherPostValidation(
         .required("The Name is required"),
       country: string()
         .strict(true)
-        .typeError("The Name Should be String")
+        .typeError("The country Should be String")
         .nullable(),
     })
-      .required("The name,author,isbn are required")
+      .required("The name is required")
       .nullable()
-      .strict(true),
+      .strict(true)
+      .noUnknown(true),
   });
 
   try {
-    const book = await bookSchema.validate({ body: req.body });
+    const response = await publisherSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+async function commentPostValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let commentSchema = object({
+    body: object({
+      name: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable()
+        .required("The Name is required"),
+      comment: string()
+        .strict(true)
+        .typeError("The comment Should be String")
+        .nullable()
+        .required("The comment is required"),
+
+      book_id: number()
+        .strict(true)
+        .typeError("The book id Should be number")
+        .nullable()
+        .required("The book id is required"),
+
+      starts: number()
+        .strict(true)
+        .typeError("The stars number Should be number")
+        .nullable(),
+    })
+      .required("The name,comment,book_id are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await commentSchema.validate({ body: req.body });
     next();
   } catch (e: any) {
     return res.status(400).send(e.message);
@@ -96,11 +141,13 @@ async function validateIDParams(
         .integer("Please enter a valid number.")
         .nullable()
         .required("The ID is required"),
-    }),
+    }).noUnknown(true),
   });
 
   try {
-    const isbn = await bookISBNParamsSchema.validate({ params: req.params });
+    const response = await bookISBNParamsSchema.validate({
+      params: req.params,
+    });
     next();
   } catch (e: any) {
     return res.status(400).send(e.message);
@@ -124,11 +171,11 @@ async function validateNameQuery(
         .strict(true)
         .typeError("The Sort Type Should be String")
         .nullable(),
-    }),
+    }).noUnknown(true),
   });
 
   try {
-    const isbn = await bookNameQuerySchema.validate({ query: req.query });
+    const response = await bookNameQuerySchema.validate({ query: req.query });
     next();
   } catch (e: any) {
     return res.status(400).send(e.message);
@@ -173,9 +220,10 @@ async function bookPostUpdateValidation(
         .typeError("The pages number Should be number")
         .nullable(),
     })
-      .required("a value required")
+      .required("A Value Should be Inserted")
       .nullable()
-      .strict(true),
+      .strict(true)
+      .noUnknown(true),
 
     params: object({
       id: number()
@@ -183,11 +231,11 @@ async function bookPostUpdateValidation(
         .integer("Please enter a valid number.")
         .nullable()
         .required("The ID is required"),
-    }),
+    }).noUnknown(true),
   });
 
   try {
-    const book = await bookSchema.validate({
+    const response = await bookSchema.validate({
       body: req.body,
       params: req.params,
     });
@@ -202,7 +250,7 @@ async function publisherPostUpdateValidation(
   res: Response,
   next: NextFunction
 ) {
-  let bookSchema = object({
+  let publisherSchema = object({
     body: object({
       name: string()
         .strict(true)
@@ -211,16 +259,75 @@ async function publisherPostUpdateValidation(
 
       country: string()
         .strict(true)
-        .typeError("The Name Should be String")
+        .typeError("The country Should be String")
         .nullable(),
     })
-      .required("The name,author,isbn are required")
+      .required("A Value Should be Inserted")
       .nullable()
-      .strict(true),
+      .strict(true)
+      .noUnknown(true),
+
+    params: object({
+      id: number()
+        .typeError("ID must be a number")
+        .integer("Please enter a valid number.")
+        .nullable()
+        .required("The ID is required"),
+    }).noUnknown(true),
   });
 
   try {
-    const book = await bookSchema.validate({ body: req.body });
+    const response = await publisherSchema.validate({
+      body: req.body,
+      params: req.params,
+    });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+async function commentPostUpdateValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let commentSchema = object({
+    body: object({
+      name: string()
+        .strict(true)
+        .typeError("The Name Should be String")
+        .nullable(),
+
+      comment: string()
+        .strict(true)
+        .typeError("The comment Should be String")
+        .nullable(),
+
+      stars: number()
+        .strict(true)
+        .typeError("The stars number Should be number")
+        .nullable(),
+    })
+      .required("A Value Should be Inserted")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+
+    params: object({
+      id: number()
+        .typeError("ID must be a number")
+        .integer("Please enter a valid number.")
+        .nullable()
+        .required("The ID is required"),
+    }).noUnknown(true),
+  });
+
+  try {
+    const response = await commentSchema.validate({
+      body: req.body,
+      params: req.params,
+    });
     next();
   } catch (e: any) {
     return res.status(400).send(e.message);
@@ -234,4 +341,6 @@ export default {
   bookPostUpdateValidation,
   publisherPostValidation,
   publisherPostUpdateValidation,
+  commentPostValidation,
+  commentPostUpdateValidation,
 };
