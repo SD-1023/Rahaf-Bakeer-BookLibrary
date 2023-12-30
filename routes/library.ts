@@ -56,7 +56,7 @@ router.get('/publishers/:id/books',  reqValidation.validateIDParams, async(req: 
 
   try {
     const publisher = getCacheValue("Publisher") as CPublisher;
-    const dataInfo = await publisher?.getOtherEntity(Number(req.params.id));
+    const dataInfo = await publisher?.getBookEntity(Number(req.params.id));
     res.status(200).send(dataInfo);
   } catch (e: any) {
     res.status(500).send();
@@ -178,7 +178,7 @@ router.patch(
         "book_id",
         req.params.id
       );
-      res.status(200).send(dataInfo.toString());
+      res.status(200).send(dataInfo);
     } catch (e: any) {
       if(e?.cause=="unique violation"){
         res.status(400).send(e.message);

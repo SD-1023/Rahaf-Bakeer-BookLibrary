@@ -13,7 +13,6 @@ export default class CBook implements DBAction<IBook> {
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {
-     
       if (e?.errors[0]?.type === "unique violation") {
         throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
       } else {
@@ -26,22 +25,24 @@ export default class CBook implements DBAction<IBook> {
     updateValue: Object,
     conditionKey: string,
     conditionValue: string | number
-  ): Promise<number> {
+  ): Promise<IBook | IBook[]> {
     try {
       const [updatedData] = await Book.update(updateValue, {
         where: {
           [conditionKey as keyof IBook]: conditionValue,
         },
       });
-
+      let book;
       if (updatedData !== 0) {
         appCache.del("BookByID");
         await this.getEntities(undefined, true);
+        if (conditionKey === "book_id") {
+          const updatedValue = await Book.findByPk(conditionValue);
+          book = updatedValue.toJSON();
+        }
       }
-
-      return updatedData;
+      return book;
     } catch (e: any) {
-  
       if (e?.errors[0]?.type === "unique violation") {
         throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
       } else {
