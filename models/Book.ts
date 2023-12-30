@@ -20,8 +20,6 @@ import { IBook } from "../interfaces/objInterfaces";
 import Publisher from "./publisher";
 import Comment from "./Comment";
 
-// export interface attributeInput extends Required<IBook> {}
-// export interface attributeOutput extends Required<IBook> {}
 
 @Table({
   timestamps: false,
@@ -83,11 +81,6 @@ class Book extends Model<IBook> implements IBook {
   })
   declare Comment: Comment[];
 
-  // @BeforeUpdate
-  // @BeforeCreate
-  // static makeUpperCase(instance: Book) {
-  //   instance.title = instance.title.toLocaleUpperCase();
-  // }
 }
 
 export default Book;

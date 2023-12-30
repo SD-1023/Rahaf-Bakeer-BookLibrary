@@ -1,13 +1,12 @@
 import DBAction from "../interfaces/classInterface";
-import { IBook, IComment, IPublisher } from "../interfaces/objInterfaces";
+import { IBook, IComment } from "../interfaces/objInterfaces";
 import Book from "../models/Book";
 import { appCache, getCacheValue } from "../appCache";
-import { number } from "yup";
-import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
-import { Sequelize } from "sequelize-typescript";
 
 export default class CComment implements DBAction<IComment> {
+
+  
   async addEntities(data: IComment): Promise<IComment> {
     try {
       const dataAdded = await Comment.create(data);
@@ -16,6 +15,9 @@ export default class CComment implements DBAction<IComment> {
       throw new Error(e);
     }
   }
+
+
+
   async updateEntities(
     updateValue: Object,
     conditionKey: string,

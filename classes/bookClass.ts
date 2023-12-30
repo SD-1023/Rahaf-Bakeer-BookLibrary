@@ -2,10 +2,9 @@ import DBAction from "../interfaces/classInterface";
 import { IBook, IComment, IPublisher } from "../interfaces/objInterfaces";
 import Book from "../models/Book";
 import { appCache, getCacheValue } from "../appCache";
-import { number } from "yup";
 import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
-import { Sequelize, addAttribute } from "sequelize-typescript";
+import { Sequelize } from "sequelize-typescript";
 import { Op } from "sequelize";
 
 export default class CBook implements DBAction<IBook> {
@@ -14,7 +13,12 @@ export default class CBook implements DBAction<IBook> {
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {
-      throw new Error(e);
+     
+      if (e?.errors[0]?.type === "unique violation") {
+        throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
+      } else {
+        throw new Error(e);
+      }
     }
   }
 
@@ -31,12 +35,18 @@ export default class CBook implements DBAction<IBook> {
       });
 
       if (updatedData !== 0) {
+        appCache.del("BookByID");
         await this.getEntities(undefined, true);
       }
 
       return updatedData;
     } catch (e: any) {
-      throw new Error(e);
+  
+      if (e?.errors[0]?.type === "unique violation") {
+        throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
+      } else {
+        throw new Error(e);
+      }
     }
   }
 
@@ -47,9 +57,6 @@ export default class CBook implements DBAction<IBook> {
       if (booksData && !updated) {
         return booksData as IBook[];
       } else {
-        if (updated) {
-          appCache.del("BookByID");
-        }
         booksData = await Book.findAll({
           raw: true,
         });
@@ -67,6 +74,7 @@ export default class CBook implements DBAction<IBook> {
     try {
       const book = await Book.findByPk(conditionValue);
       await book?.destroy();
+      appCache.del("BookByID");
       await this.getEntities(undefined, true);
     } catch (e: any) {
       throw new Error(e.message);

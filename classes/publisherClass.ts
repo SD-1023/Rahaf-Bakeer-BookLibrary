@@ -1,11 +1,8 @@
 import DBAction from "../interfaces/classInterface";
-import { IBook, IComment, IPublisher } from "../interfaces/objInterfaces";
+import { IBook, IPublisher } from "../interfaces/objInterfaces";
 import Book from "../models/Book";
 import { appCache, getCacheValue } from "../appCache";
-import { number, object } from "yup";
 import Publisher from "../models/publisher";
-import Comment from "../models/Comment";
-import { Sequelize } from "sequelize-typescript";
 
 export default class CPublisher implements DBAction<IPublisher> {
   async addEntities(data: IPublisher): Promise<IPublisher> {

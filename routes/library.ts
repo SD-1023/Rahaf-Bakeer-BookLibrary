@@ -129,8 +129,13 @@ router.post(
       const dataInfo = await book?.addEntities(req.body);
       res.status(200).send(dataInfo);
     } catch (e: any) {
+      if(e?.cause=="unique violation"){
+        res.status(400).send(e.message);
+
+      }else{
+
       res.status(500).send();
-    }
+    }}
   }
 );
 
@@ -175,7 +180,13 @@ router.patch(
       );
       res.status(200).send(dataInfo.toString());
     } catch (e: any) {
+      if(e?.cause=="unique violation"){
+        res.status(400).send(e.message);
+
+      }else{
+
       res.status(500).send();
+    }
     }
   }
 );

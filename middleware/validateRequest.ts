@@ -110,7 +110,7 @@ async function commentPostValidation(
         .nullable()
         .required("The book id is required"),
 
-      starts: number()
+      stars: number()
         .strict(true)
         .typeError("The stars number Should be number")
         .nullable(),
@@ -294,10 +294,6 @@ async function commentPostUpdateValidation(
 ) {
   let commentSchema = object({
     body: object({
-      name: string()
-        .strict(true)
-        .typeError("The Name Should be String")
-        .nullable(),
 
       comment: string()
         .strict(true)
