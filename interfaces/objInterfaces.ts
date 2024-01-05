@@ -10,6 +10,7 @@ export interface IBook{
     author?:string;
     pages?:number;
     quantity:number;
+    user_id?:number;
 }
 
 

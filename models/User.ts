@@ -25,6 +25,7 @@ import bcrypt from "bcrypt";
 import Session from "./Session";
 import Comment from "./Comment";
 import RentedBook from "./RentedBook";
+import Book from "./Book";
 
 @Table({
   timestamps: false,
@@ -102,6 +103,15 @@ class User extends Model<IUser> implements IUser {
     hooks: true,
   })
   declare Comment: Comment[];
+
+
+  @HasMany(() => Book, {
+    foreignKey: "user_id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    hooks: true,
+  })
+  declare Book: Book[];
 
   @Column({
     type: DataType.INTEGER,
