@@ -23,11 +23,26 @@ export interface IPublisher{
 export interface IComment{
     comment_id?:number;
     book_id:number;
-    name:string;
+    user_id:number;
     comment:string;
     stars?:number;
 }
 
+
+
+
+export interface IUser{
+
+    user_id?:number;
+    first_name:string;
+    last_name:string;
+    age?:number;
+    DOB?:Date|string;
+    email:string;
+    password?:string;
+    optCode?:number;
+
+}
 
 export default{
  

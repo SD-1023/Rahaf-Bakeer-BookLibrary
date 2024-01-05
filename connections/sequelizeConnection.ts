@@ -3,6 +3,20 @@ import dbConfig from "../db.config";
 import Book from "../models/Book";
 import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
+import User from "../models/User";
+import Session from "../models/Session";
+import { appCache } from "../appCache";
+import CBook from "../classes/bookClass";
+import CComment from "../classes/commentClass";
+import CPublisher from "../classes/publisherClass";
+import CUser from "../classes/userClass";
+
+
+
+appCache.set("Book", new CBook());
+appCache.set("Publisher", new CPublisher());
+appCache.set("Comment", new CComment());
+appCache.set("User", new CUser());
 
 const sequelize = new Sequelize({
   database: dbConfig.DB,
@@ -14,7 +28,7 @@ const sequelize = new Sequelize({
   dialect: "mysql",
 });
 
-sequelize.addModels([Book, Publisher, Comment]);
+sequelize.addModels([Book, Publisher, Comment,User,Session]);
 sequelize
   .authenticate()
   .then(() => {

@@ -14,6 +14,7 @@ import {
 } from "sequelize-typescript";
 import { IComment } from "../interfaces/objInterfaces";
 import Book from "./Book";
+import User from "./User";
 
 @Table({
   timestamps: false,
@@ -28,11 +29,18 @@ class Comment extends Model<IComment> implements IComment {
   })
   declare comment_id?: number;
 
+
   @AllowNull(false)
+  @ForeignKey(() => User)
   @Column({
-    type: DataType.STRING(1024),
+    type: DataType.INTEGER,
+    onDelete: "CASCADE",
   })
-  declare name: string;
+  declare user_id: number;
+  
+  @BelongsTo(() => User, { foreignKey: "user_id", onDelete: "CASCADE" })
+  declare User: User;
+  
 
   @AllowNull(false)
   @Column({

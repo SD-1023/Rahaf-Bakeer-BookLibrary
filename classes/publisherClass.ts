@@ -110,7 +110,7 @@ export default class CPublisher implements DBAction<IPublisher> {
   }
 
 
-async getBookEntity(id:number): Promise<IBook[]> {
+async getOtherEntity(id:number): Promise<IBook[]> {
 const data= await this.getEntityByID(id) as object;
 return data["books" as keyof object] as IBook[];
 
