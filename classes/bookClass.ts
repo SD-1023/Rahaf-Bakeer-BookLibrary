@@ -10,8 +10,9 @@ import sequelizeConnection from "../connections/sequelizeConnection";
 import RentedBook from "../models/RentedBook";
 
 export default class CBook implements DBAction<IBook> {
-  async addEntities(data: IBook): Promise<IBook> {
+  async addEntities(data: IBook,user_id?:number): Promise<IBook> {
     try {
+      data.user_id=user_id;
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {

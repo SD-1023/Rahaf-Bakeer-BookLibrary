@@ -77,7 +77,7 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const book = getCacheValue("Book") as CBook;
-      const dataInfo = await book?.addEntities(req.body);
+      const dataInfo = await book?.addEntities(req.body,Number(req.params.user_id));
       res.status(200).send(dataInfo);
     } catch (e: any) {
       if (e?.cause == "unique violation") {

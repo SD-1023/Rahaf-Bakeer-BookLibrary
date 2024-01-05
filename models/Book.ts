@@ -21,6 +21,7 @@ import { IBook } from "../interfaces/objInterfaces";
 import Publisher from "./publisher";
 import Comment from "./Comment";
 import RentedBook from "./RentedBook";
+import User from "./User";
 
 @Table({
   timestamps: false,
@@ -58,6 +59,19 @@ class Book extends Model<IBook> implements IBook {
 
   @BelongsTo(() => Publisher, { foreignKey: "publisher_id" })
   Publisher: Publisher;
+
+
+
+  @AllowNull(false)
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER,
+    onDelete: "CASCADE",
+  })
+  declare user_id: number;
+
+  @BelongsTo(() => User, { foreignKey: "user_id" })
+  User: User;
 
   @Column({
     type: DataType.INTEGER,
