@@ -27,7 +27,7 @@ router.get(
 );
 
 router.get(
-  "/books/:id",
+  "/:id",
   reqValidation.validateIDParams,
   authentication.authenticateUser,
   async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ router.get(
   }
 );
 
-router.get("/books", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
     const book = getCacheValue("Book") as CBook;
     const dataInfo = await book?.getEntities();
@@ -51,8 +51,27 @@ router.get("/books", async (req: Request, res: Response) => {
   }
 });
 
+
 router.post(
-  "/books",
+  "/rentBook/:id",
+  reqValidation.rentBookPostValidation,
+  authentication.authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      const book = getCacheValue("Book") as CBook;
+      const dataInfo = await book?.rentBook(Number(req.params.id),Number(req.params.user_id),req.body);
+      res.status(200).send(dataInfo);
+    } catch (e: any) {
+    
+        res.status(500).send();
+    
+    }
+  }
+);
+
+
+router.post(
+  "/",
   reqValidation.bookPostValidation,
   authentication.authenticateUser,
   async (req: Request, res: Response) => {
@@ -70,8 +89,12 @@ router.post(
   }
 );
 
+
+
+
+
 router.patch(
-  "/books/:id",
+  "/:id",
   reqValidation.bookPostUpdateValidation,
   authentication.authenticateUser,
   async (req: Request, res: Response) => {
@@ -94,7 +117,7 @@ router.patch(
 );
 
 router.delete(
-  "/books/:id",
+  "/:id",
   reqValidation.validateIDParams,
   authentication.authenticateUser,
   async (req: Request, res: Response) => {

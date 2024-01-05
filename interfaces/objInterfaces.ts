@@ -9,6 +9,7 @@ export interface IBook{
     year?:number;
     author?:string;
     pages?:number;
+    quantity:number;
 }
 
 

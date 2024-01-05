@@ -24,6 +24,7 @@ import moment from "moment";
 import bcrypt from "bcrypt";
 import Session from "./Session";
 import Comment from "./Comment";
+import RentedBook from "./RentedBook";
 
 @Table({
   timestamps: false,
@@ -60,9 +61,7 @@ class User extends Model<IUser> implements IUser {
     type: DataType.DATEONLY,
   })
   get DOB(): string {
-    return moment(this.getDataValue("DOB"), "YYYY-MM-DD").format(
-      "YYYY-MM-DD"
-    );
+    return moment(this.getDataValue("DOB"), "YYYY-MM-DD").format("YYYY-MM-DD");
   }
 
   @Unique(true)
@@ -108,6 +107,14 @@ class User extends Model<IUser> implements IUser {
     type: DataType.INTEGER,
   })
   declare optCode?: number;
+
+  @HasMany(() => RentedBook, {
+    foreignKey: "user_id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    hooks: true,
+  })
+  declare RentedBook: RentedBook[];
 
   @BeforeCreate
   static setAge(instance: User) {

@@ -108,6 +108,7 @@ export default class CUser {
           );
           if (validate) {
             delete userData.password;
+            delete userData.optCode;
             const [token, expirationDate] = await this.generateOrUpdateSession(
               userData.user_id
             );
@@ -134,6 +135,9 @@ export default class CUser {
     }
   }
 
+
+
+
   async clearSession(user_id: number) {
     try {
       const deleteSession = await Session.destroy({
@@ -146,7 +150,8 @@ export default class CUser {
     }
   }
 
-  async changePassword(passwords: any, user_id: number) {
+  async changePassword(passwords: any, user_id: number) :Promise<string>{
+  
     try {
       const userData = await this.checkUserExists("user_id", user_id);
       if (userData) {
@@ -163,7 +168,8 @@ export default class CUser {
               salt
             );
             try {
-              const updatedData = await User.update(
+              
+              const updatedData =  User.update(
                 { password: updatedPassword },
                 {
                   where: {
@@ -171,7 +177,9 @@ export default class CUser {
                   },
                 }
               );
-              await this.clearSession(user_id);
+             const clearedSession=  this.clearSession(user_id);
+              await Promise.all([updatedData, clearedSession]);
+return "";
             } catch (e: any) {
               throw new Error(e.message);
             }
@@ -202,6 +210,21 @@ export default class CUser {
     }
   }
 
+
+  sendEmail(email:string,subject:string,message:string){
+    emailOPT.emailOptions.to = email;
+    emailOPT.emailOptions.subject = subject;
+    emailOPT.emailOptions.text = message;
+    emailOPT.transporter.sendMail(
+      emailOPT.emailOptions,
+      function (error, info) {
+        if (error) {
+          throw new Error(error.message);
+        }
+      }
+    );
+  }
+
   async sendOPTCode(data: any) {
     try {
       let user = await User.findOne({ where: { email: data.email } });
@@ -216,18 +239,8 @@ export default class CUser {
             },
           }
         );
-
-        emailOPT.emailOptions.to = user.email;
-        emailOPT.emailOptions.subject = "OPT CODE";
-        emailOPT.emailOptions.text = "Your OPT CODE is " + randomOPT.toString();
-        emailOPT.transporter.sendMail(
-          emailOPT.emailOptions,
-          function (error, info) {
-            if (error) {
-              throw new Error(error.message);
-            }
-          }
-        );
+this.sendEmail(user.email,"OPT CODE","Your OPT CODE is " + randomOPT.toString())
+     
       } else {
         throw new Error("The Email not found", {
           cause: "NOT FOUND",
