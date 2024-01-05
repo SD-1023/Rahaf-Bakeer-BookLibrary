@@ -1,5 +1,6 @@
-import { object, string, number } from "yup";
+import { object, string, number, date } from "yup";
 import { Request, Response, NextFunction } from "express";
+import { parse } from "date-fns";
 
 async function bookPostValidation(
   req: Request,
@@ -93,11 +94,11 @@ async function commentPostValidation(
 ) {
   let commentSchema = object({
     body: object({
-      name: string()
+      user_id: number()
         .strict(true)
-        .typeError("The Name Should be String")
+        .typeError("The user Should be number")
         .nullable()
-        .required("The Name is required"),
+        .required("The user id is required"),
       comment: string()
         .strict(true)
         .typeError("The comment Should be String")
@@ -134,18 +135,18 @@ async function validateIDParams(
   res: Response,
   next: NextFunction
 ) {
-  let bookISBNParamsSchema = object({
+  let IDParamsSchema = object({
     params: object({
       id: number()
         .typeError("id must be a number")
-        .integer("Please enter a valid number.")
+        .integer(" enter a valid number")
         .nullable()
         .required("The ID is required"),
     }).noUnknown(true),
   });
 
   try {
-    const response = await bookISBNParamsSchema.validate({
+    const response = await IDParamsSchema.validate({
       params: req.params,
     });
     next();
@@ -294,7 +295,6 @@ async function commentPostUpdateValidation(
 ) {
   let commentSchema = object({
     body: object({
-
       comment: string()
         .strict(true)
         .typeError("The comment Should be String")
@@ -330,6 +330,297 @@ async function commentPostUpdateValidation(
   }
 }
 
+async function UserPostValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      first_name: string()
+        .strict(true)
+        .typeError("The First Name Should be String")
+        .nullable()
+        .required("The First Name is required"),
+
+      last_name: string()
+        .strict(true)
+        .typeError("The Last Name Should be String")
+        .nullable()
+        .required("The Last Name is required"),
+
+      DOB: string()
+        .strict(true)
+        .typeError("date must be a string formate")
+        .nullable()
+        .required("The date is required")
+        .test("max", "the date is in the future", function (value) {
+          return Number(value.split("-")[0]) < new Date().getFullYear();
+        })
+        .matches(
+          /^([0-9]{4})\-([0-9]{2})\-([0-9]{2})$/,
+          "Date must be in format yyyy-MM-dd"
+        ),
+      email: string()
+        .strict(true)
+        .typeError("The Email Should be String")
+        .required("The email is required")
+        .email("It should be in the Email form")
+        .nullable(),
+
+      password: string()
+        .strict(true)
+        .required("The password is required")
+        .typeError("The password Should be String")
+        .min(6, 'password should not be less than 6 digits')
+        .matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).*$/,
+          "The password must contain characters,numbers and special characters"
+        )
+        .nullable(),
+    })
+      .required("The first name,last name,email,DOB,password are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+async function UserLoginValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      email: string()
+        .strict(true)
+        .typeError("The Email Should be String")
+        .required("The email is required")
+        .email("It should be in the Email form")
+        .nullable(),
+
+      password: string()
+        .strict(true)
+        .required("The password is required")
+        .typeError("The password Should be String")
+        .nullable(),
+    })
+      .required("The email,password are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+async function changePasswordValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      oldPassword: string()
+        .strict(true)
+        .typeError("The old Password Should be String")
+        .nullable()
+        .required("The old Password is required"),
+
+      newPassword: string()
+        .strict(true)
+        .typeError("The new Password Should be String")
+        .nullable()
+        .min(6, 'password should not be less than 6 digits')
+        .matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).*$/,
+        "The password must contain characters,numbers and special characters"
+      )
+        .required("The new Password is required"),
+
+      confirmPassword: string()
+        .strict(true)
+        .typeError("The confirm Password Should be String")
+        .nullable()
+        .min(6, 'password should not be less than 6 digits')
+        .matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).*$/,
+        "The password must contain characters,numbers and special characters"
+      )
+        .required("The confirm Password  is required"),
+    })
+      .required("The old ,new and confirm Passwords are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+async function validateUserIDParams(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let IDParamsSchema = object({
+    params: object({
+      user_id: number()
+        .typeError("id must be a number")
+        .integer("Please enter a valid number.")
+        .nullable()
+        .required("The ID is required"),
+    }).noUnknown(true),
+  });
+
+  try {
+    const response = await IDParamsSchema.validate({
+      params: req.params,
+    });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+
+
+
+async function emailValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      email: string()
+        .strict(true)
+        .typeError("The Email Should be String")
+        .required("The email is required")
+        .email("It should be in the Email form")
+        .nullable(),
+
+     
+    })
+      .required("The email,password,confirm Password are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+
+
+
+
+
+async function OPTCodeValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      email: string()
+        .strict(true)
+        .typeError("The Email Should be String")
+        .required("The email is required")
+        .email("It should be in the Email form")
+        .nullable(),
+
+      optCode: number()
+        .strict(true)
+        .required("The opt code is required")
+        .typeError("The opt code Should be number") 
+        .nullable(),
+
+       
+    })
+      .required("The email,opt code,  are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+
+async function forgetPassValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let userSchema = object({
+    body: object({
+      email: string()
+        .strict(true)
+        .typeError("The Email Should be String")
+        .required("The email is required")
+        .email("It should be in the Email form")
+        .nullable(),
+
+      password: string()
+        .strict(true)
+        .required("The password is required")
+        .typeError("The password Should be String") 
+        .min(6, 'password should not be less than 6 digits')
+        .matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).*$/,
+        "The password must contain characters,numbers and special characters"
+      )
+        .nullable(),
+
+        confirmPassword: string()
+        .strict(true)
+        .required("The confirm Password is required")
+        .typeError("The confirm Password Should be String")
+        .min(6, 'password should not be less than 6 digits')
+        .matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).*$/,
+        "The password must contain characters,numbers and special characters"
+      )
+        .nullable(),
+    })
+      .required("The email,password,confirm Password are required")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+  });
+
+  try {
+    const response = await userSchema.validate({ body: req.body });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
 export default {
   bookPostValidation,
   validateIDParams,
@@ -339,4 +630,11 @@ export default {
   publisherPostUpdateValidation,
   commentPostValidation,
   commentPostUpdateValidation,
+  UserPostValidation,
+  UserLoginValidation,
+  validateUserIDParams,
+  changePasswordValidation,
+  emailValidation,
+  OPTCodeValidation,
+  forgetPassValidation,
 };

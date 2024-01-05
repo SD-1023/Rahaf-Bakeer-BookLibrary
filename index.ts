@@ -1,13 +1,18 @@
 import express from "express";
 import "./connections/sequelizeConnection";
 import {Sequelize} from 'sequelize';
-import libRoutes from "./routes/library"
-
+import booksRoutes from "./routes/books"
+import publisherRoutes from "./routes/publisher";
+import commentRoutes from "./routes/comment";
+import userRoutes from "./routes/user";
 const app = express();
 
 
 
-app.use("/library",libRoutes);
+app.use("/library/books",booksRoutes);
+app.use("/library/publishers",publisherRoutes);
+app.use("/library/comments",commentRoutes);
+app.use("/library/users",userRoutes);
 
 app.use(async (req, res, next)=>{ 
 

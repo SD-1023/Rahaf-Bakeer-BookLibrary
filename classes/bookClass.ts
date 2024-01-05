@@ -13,7 +13,7 @@ export default class CBook implements DBAction<IBook> {
       const dataAdded = await Book.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {
-      if (e?.errors[0]?.type === "unique violation") {
+      if (e.name === "SequelizeUniqueConstraintError") {
         throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
       } else {
         throw new Error(e);
@@ -43,7 +43,7 @@ export default class CBook implements DBAction<IBook> {
       }
       return book;
     } catch (e: any) {
-      if (e?.errors[0]?.type === "unique violation") {
+      if (e.name === "SequelizeUniqueConstraintError") {
         throw new Error(e?.errors[0]?.message, { cause: "unique violation" });
       } else {
         throw new Error(e);
