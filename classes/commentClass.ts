@@ -7,8 +7,9 @@ import Comment from "../models/Comment";
 export default class CComment implements DBAction<IComment> {
 
   
-  async addEntities(data: IComment): Promise<IComment> {
+  async addEntities(data: IComment,user_id?:number): Promise<IComment> {
     try {
+      data.user_id=user_id;
       const dataAdded = await Comment.create(data);
       return dataAdded.toJSON();
     } catch (e: any) {

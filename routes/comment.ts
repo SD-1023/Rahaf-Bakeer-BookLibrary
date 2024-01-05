@@ -48,7 +48,7 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const comment = getCacheValue("Comment") as CComment;
-      const dataInfo = await comment?.addEntities(req.body);
+      const dataInfo = await comment?.addEntities(req.body,Number(req.params.user_id));
       res.status(200).send(dataInfo);
     } catch (e: any) {
       res.status(500).send();

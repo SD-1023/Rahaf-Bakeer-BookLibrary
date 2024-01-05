@@ -10,6 +10,7 @@ import CBook from "../classes/bookClass";
 import CComment from "../classes/commentClass";
 import CPublisher from "../classes/publisherClass";
 import CUser from "../classes/userClass";
+import RentedBook from "../models/RentedBook";
 
 
 
@@ -28,7 +29,7 @@ const sequelize = new Sequelize({
   dialect: "mysql",
 });
 
-sequelize.addModels([Book, Publisher, Comment,User,Session]);
+sequelize.addModels([Book, Publisher, Comment,User,Session,RentedBook]);
 sequelize
   .authenticate()
   .then(() => {
@@ -39,4 +40,4 @@ sequelize
     console.error("Unable to connect to the database:", error);
   });
 
-export default {};
+export default {sequelize};

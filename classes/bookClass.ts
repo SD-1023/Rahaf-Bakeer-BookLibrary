@@ -6,6 +6,8 @@ import Publisher from "../models/publisher";
 import Comment from "../models/Comment";
 import { Sequelize } from "sequelize-typescript";
 import { Op } from "sequelize";
+import sequelizeConnection from "../connections/sequelizeConnection";
+import RentedBook from "../models/RentedBook";
 
 export default class CBook implements DBAction<IBook> {
   async addEntities(data: IBook): Promise<IBook> {
@@ -136,6 +138,7 @@ export default class CBook implements DBAction<IBook> {
           "publisher_id",
           "pages",
           "year",
+          "quantity",
           [Sequelize.fn("AVG", Sequelize.col("Comment.stars")), "AVGRating"],
         ],
         include: {
@@ -154,6 +157,69 @@ export default class CBook implements DBAction<IBook> {
         limit: 10,
       });
       return data;
+    } catch (e: any) {
+      throw new Error(e);
+    }
+  }
+
+  async rentBook(book_id:number,user_id:number,data:any): Promise<object> {
+    try {
+      const trans = await sequelizeConnection.sequelize.transaction();
+
+      try {
+        const book = await Book.findOne({
+          where: {
+            book_id: book_id,
+            quantity: {
+              [Op.not]: 0,
+            },
+          },
+          transaction: trans,
+        });
+        if (book) {
+          try {
+            const rent_book = await RentedBook.create(
+              {
+                user_id: user_id,
+                book_id: book_id,
+                copies_number: data.copies_number,
+              },
+              { transaction: trans }
+            );
+            const bookInfo = book.toJSON();
+
+            const updatedBook = await Book.update(
+              { quantity: bookInfo.quantity - 1 },
+              
+              {
+                where: {
+                  book_id: book_id,
+                },
+                transaction:trans,
+              },
+            );
+            const commitTrans = trans.commit();
+            try {
+              await Promise.all([updatedBook, commitTrans]);
+              return rent_book.toJSON();
+            } catch (e: any) {
+              await trans.rollback();
+              throw new Error(e);
+            }
+          } catch (e: any) {
+            await trans.rollback();
+            throw new Error(e);
+          }
+        } else {
+          throw {
+            message:
+              "There is no book left with id = " + book_id.toString(),
+          };
+        }
+      } catch (e: any) {
+        await trans.rollback();
+        throw new Error(e);
+      }
     } catch (e: any) {
       throw new Error(e);
     }

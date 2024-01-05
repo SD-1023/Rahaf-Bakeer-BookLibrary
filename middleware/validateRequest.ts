@@ -41,8 +41,15 @@ async function bookPostValidation(
         .strict(true)
         .typeError("The pages number Should be number")
         .nullable(),
+
+
+        quantity: number()
+        .strict(true)
+        .typeError("The quantity Should be number")
+        .nullable() 
+        .required("The quantity  required"),
     })
-      .required("The name,author,isbn are required")
+      .required("The name,author,isbn,quantity are required")
       .nullable()
       .strict(true)
       .noUnknown(true),
@@ -94,11 +101,7 @@ async function commentPostValidation(
 ) {
   let commentSchema = object({
     body: object({
-      user_id: number()
-        .strict(true)
-        .typeError("The user Should be number")
-        .nullable()
-        .required("The user id is required"),
+     
       comment: string()
         .strict(true)
         .typeError("The comment Should be String")
@@ -220,6 +223,12 @@ async function bookPostUpdateValidation(
         .strict(true)
         .typeError("The pages number Should be number")
         .nullable(),
+   
+        quantity: number()
+        .strict(true)
+        .typeError("The quantity Should be number")
+        .nullable() ,
+     
     })
       .required("A Value Should be Inserted")
       .nullable()
@@ -245,6 +254,58 @@ async function bookPostUpdateValidation(
     return res.status(400).send(e.message);
   }
 }
+
+
+
+
+
+
+
+
+
+
+async function rentBookPostValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let bookSchema = object({
+    body: object({
+     
+   
+      copies_number: number()
+        .strict(true)
+        .typeError("The copies number Should be number")
+        .nullable().required(),
+
+     
+    })
+      .required("A Value Should be Inserted")
+      .nullable()
+      .strict(true)
+      .noUnknown(true),
+
+    params: object({
+      id: number()
+        .typeError("ID must be a number")
+        .integer("Please enter a valid number.")
+        .nullable()
+        .required("The ID is required"),
+    }).noUnknown(true),
+  });
+
+  try {
+    const response = await bookSchema.validate({
+      body: req.body,
+      params: req.params,
+    });
+    next();
+  } catch (e: any) {
+    return res.status(400).send(e.message);
+  }
+}
+
+
 
 async function publisherPostUpdateValidation(
   req: Request,
@@ -637,4 +698,5 @@ export default {
   emailValidation,
   OPTCodeValidation,
   forgetPassValidation,
+  rentBookPostValidation
 };

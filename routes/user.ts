@@ -82,8 +82,8 @@ router.post(
     async (req: Request, res: Response) => {
       try {
         const user = getCacheValue("User") as CUser;
-        const dataInfo = await user?.sendOPTCode(req.body);
-        res.status(200).send(dataInfo);
+      await user?.sendOPTCode(req.body);
+        res.status(200).end();
       } catch (e: any) {
         if (e?.cause == "Validation Error") {
           res.status(400).send(e.message);
@@ -127,7 +127,7 @@ router.patch(
         req.body,
         Number(req.params.user_id)
       );
-      res.status(200).send();
+      res.status(200).cookie("session_token",dataInfo).send();
     } catch (e: any) {
       if (e?.cause == "Validation Error") {
         res.status(400).send(e.message);
@@ -146,10 +146,10 @@ router.patch(
     async (req: Request, res: Response) => {
       try {
         const user = getCacheValue("User") as CUser;
-        const dataInfo = await user?.forgetPassword(
+          await user?.forgetPassword(
           req.body,
         );
-        res.status(200).send();
+        res.status(200).end();
       } catch (e: any) {
         if (e?.cause == "Validation Error") {
           res.status(400).send(e.message);

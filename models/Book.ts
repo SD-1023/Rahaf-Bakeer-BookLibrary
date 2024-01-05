@@ -15,11 +15,12 @@ import {
   BeforeCreate,
   BelongsTo,
   Association,
+  NotNull,
 } from "sequelize-typescript";
 import { IBook } from "../interfaces/objInterfaces";
 import Publisher from "./publisher";
 import Comment from "./Comment";
-
+import RentedBook from "./RentedBook";
 
 @Table({
   timestamps: false,
@@ -68,6 +69,12 @@ class Book extends Model<IBook> implements IBook {
   })
   declare year?: number;
 
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare quantity: number;
+
   @Column({
     type: DataType.STRING(100),
   })
@@ -81,6 +88,13 @@ class Book extends Model<IBook> implements IBook {
   })
   declare Comment: Comment[];
 
+  @HasMany(() => RentedBook, {
+    foreignKey: "book_id",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    hooks: true,
+  })
+  declare RentedBook: RentedBook[];
 }
 
 export default Book;
