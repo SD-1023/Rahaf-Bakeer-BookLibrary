@@ -172,12 +172,13 @@ export default class CBook implements DBAction<IBook> {
           where: {
             book_id: book_id,
             quantity: {
-              [Op.not]: 0,
+              [Op.gte]: data.copies_number,
             },
           },
           transaction: trans,
         });
         if (book) {
+          //transaction isoliation
           try {
             const rent_book = await RentedBook.create(
               {
@@ -190,7 +191,7 @@ export default class CBook implements DBAction<IBook> {
             const bookInfo = book.toJSON();
 
             const updatedBook = await Book.update(
-              { quantity: bookInfo.quantity - 1 },
+              { quantity: bookInfo.quantity - data.copies_number },
               
               {
                 where: {
